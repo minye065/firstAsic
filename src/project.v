@@ -12,6 +12,7 @@ module tt_um_math_module
   input wire rst_n
 );
 
+
   wire sck = ui_in[0];
   wire cs_n = ui_in[1];
   wire mosi = ui_in[2];
