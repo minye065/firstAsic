@@ -11,6 +11,13 @@ async def sendByte(handle, byte):
         await ClockCycles(handle.clk, 8)
         handle.ui_in.value = bit << 2
 
+async def transaction(handle, opcode, a, b):
+    handle.ui_in.value = handle.ui_in.value = 0
+    await ClockCycles(handle.clk, 4)
+    await sendByte(handle, opcode)
+    await sendByte(handle, a)
+    await sendByte(handle, b)
+
 @cocotb.test()
 async def test_project(dut):
     dut._log.info("Start")
@@ -23,5 +30,5 @@ async def test_project(dut):
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
-    dut.ui_in.value = 0
-    await sendByte(dut, 0xA5)
+    await transaction(dut, 0, 1, 2);
+    await ClockCycles(dut.clk, 8);
