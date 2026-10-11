@@ -43,6 +43,6 @@ async def test_project(dut):
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
     result = await transaction(dut, 0, 1, 2);
-    dut.log.info(f"result = {result}")
+    dut._log.info(f"result = {result}")
     assert result == 3
     await ClockCycles(dut.clk, 8);
