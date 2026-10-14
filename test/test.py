@@ -70,3 +70,4 @@ async def test_project(dut):
     result = await transaction(dut, 8, 3, 2)
     dut._log.info(f"result = {result}")
     assert result == 0 # CHECK DEFAULT
+    await ClockCycles(dut.clk, 8)
