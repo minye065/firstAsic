@@ -27,7 +27,7 @@ async def transaction(handle, opcode, a, b):
         await ClockCycles(handle.clk, 8)
         handle.ui_in.value = 0
     handle.ui_in.value = 2
-    await ClockCycles(dut.clk, 8)
+    await ClockCycles(handle.clk, 8)
     return result
 
 
