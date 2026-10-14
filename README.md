@@ -23,7 +23,7 @@ Mode 0 spi
 Byte order:
 opcode, input1, input2, dummy byte
 Leftmost bit first
-sck must be 10x slower then clk
+sck must be 10x slower than clk
 
 cs_n info:
 active is low, keep low for all 4 bytes
@@ -50,9 +50,19 @@ We do this by using the if statement:
 We take this bit into register via bit shifting left.
 We increment bit counter, and check if bit counter is 7. If bit counter is 7, what we just put in the register would be the 8th bit. 
 We incriment bytestate as the opcode, input1 and input2 come in order.
-On the 4th byte's falling edge, we then send the output 1 bit at a timethrough miso. We send the left bit first.
+After recieving all input bytes, we then send the output on falling edges, 1 bit at a timethrough miso. We send the left bit first.
 
 Falling edge - Opposite of a rising edge, the moment a signal goes from 1 to 0
 
 The result is computed continuously from the stored info.
 
+Pins
+```
+  # Inputs
+  ui[0]: "Serial clock"
+  ui[1]: "Chip select (active low)"
+  ui[2]: "Master out Slave in"
+
+  # Outputs
+  uo[0]: "Master in Slave out"
+```
