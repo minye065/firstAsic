@@ -1,42 +1,58 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+# SPI Math Slave
 
-# Tiny Tapeout Verilog Project Template
+In layman's terms: A chip that does math operations.
 
-- [Read the documentation for project](docs/info.md)
 
-## What is Tiny Tapeout?
+Operation codes:
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+0 - Add
+1 - Subtract 
+2 - AND
+3 - OR
+4 - XOR
+5 - NAND
+6 - Left shift
+7 - Right shift
+8-255 - Returns 8'd0
 
-To learn more and get started, visit https://tinytapeout.com.
 
-## Set up your Verilog project
+Input 1, Input 2 and Operation code are all 8 bits
+Output is also 8 bits
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
+Mode 0 spi
+Byte order:
+opcode, input1, input2, dummy byte
+Leftmost bit first
+sck must be 10x slower then clk
 
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
+cs_n info:
+active is low, keep low for all 4 bytes
+after lowering wait 4 clk cycles
+after raising wait some clk cycles (in test I used 8)
+if cs_n is raised mid-transaction, the sequence is aborted
 
-## Enable GitHub actions to build the results page
 
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
 
-## Resources
 
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
+Some explanations:
+clk - The chip's clock
+sck - The master's clock
+cs_n - Chip select, low = chip is selected
+mosi - Master out slave in, or the input into the chip
+miso - Master in slave out, or the output from the chip
 
-## What next?
+Every clk cycle we run the main block
+We update sck_prev with the current sck
+Then we check if we are on a rising edge.
+Rising edge - The moment a signal goes from 0 to 1
+We do this by using the if statement:
+```      if(sck == 1 && sck_prev == 0)      ```
+We take this bit into register via bit shifting left.
+We increment bit counter, and check if bit counter is 7. If bit counter is 7, what we just put in the register would be the 8th bit. 
+We incriment bytestate as the opcode, input1 and input2 come in order.
+On the 4th byte's falling edge, we then send the output 1 bit at a timethrough miso. We send the left bit first.
 
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+Falling edge - Opposite of a rising edge, the moment a signal goes from 1 to 0
+
+The result is computed continuously from the stored info.
+
