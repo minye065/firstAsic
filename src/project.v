@@ -80,7 +80,7 @@ module tt_um_math_module
       2: result = operandA & operandB;
       3: result = operandA | operandB;
       4: result = operandA ^ operandB;
-      5: result = ~operandA;
+      5: result = ~(operandA & operandB);
       6: result = operandA << operandB;
       7: result = operandA >> operandB;
       default: result = 8'd0;

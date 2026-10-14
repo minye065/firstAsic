@@ -27,6 +27,7 @@ async def transaction(handle, opcode, a, b):
         await ClockCycles(handle.clk, 8)
         handle.ui_in.value = 0
     handle.ui_in.value = 2
+    await ClockCycles(dut.clk, 8)
     return result
 
 
@@ -42,7 +43,30 @@ async def test_project(dut):
     dut.rst_n.value = 0
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
-    result = await transaction(dut, 0, 1, 2);
+    result = await transaction(dut, 0, 1, 2)
     dut._log.info(f"result = {result}")
-    assert result == 3
-    await ClockCycles(dut.clk, 8);
+    assert result == 3 # CHECK ADD
+    result = await transaction(dut, 1, 5, 3)
+    dut._log.info(f"result = {result}")
+    assert result == 2 # CHECK SUB
+    result = await transaction(dut, 2, 0xF0, 0x3c)
+    dut._log.info(f"result = {result}")
+    assert result == 0x30 # CHECK AND
+    result = await transaction(dut, 3, 0xF0, 0x3c)
+    dut._log.info(f"result = {result}")
+    assert result == 0xFC # CHECK OR
+    result = await transaction(dut, 4, 0xF0, 0x3c)
+    dut._log.info(f"result = {result}")
+    assert result == 0xCC # CHECK XOR
+    result = await transaction(dut, 5, 0xF0, 0x3c)
+    dut._log.info(f"result = {result}")
+    assert result == 0xCF # CHECK NAND
+    result = await transaction(dut, 6, 3, 2)
+    dut._log.info(f"result = {result}")
+    assert result == 12 # CHECK LEFT SHIFT
+    result = await transaction(dut, 7, 128, 2)
+    dut._log.info(f"result = {result}")
+    assert result == 32 # CHECK RIGHT SHIFT
+    result = await transaction(dut, 8, 3, 2)
+    dut._log.info(f"result = {result}")
+    assert result == 0 # CHECK DEFAULT
