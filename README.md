@@ -1,4 +1,4 @@
-# SPI Math Slave
+SPI Math Slave
 
 In layman's terms: A chip that does math operations.
 
@@ -49,8 +49,8 @@ We do this by using the if statement:
 ```      if(sck == 1 && sck_prev == 0)      ```
 We take this bit into register via bit shifting left.
 We increment bit counter, and check if bit counter is 7. If bit counter is 7, what we just put in the register would be the 8th bit. 
-We incriment bytestate as the opcode, input1 and input2 come in order.
-After recieving all input bytes, we then send the output on falling edges, 1 bit at a timethrough miso. We send the left bit first.
+We increment bytestate as the opcode, input1 and input2 come in order.
+After receiving all input bytes, we then send the output on falling edges, 1 bit at a time through miso. We send the left bit first.
 
 Falling edge - Opposite of a rising edge, the moment a signal goes from 1 to 0
 
